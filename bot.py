@@ -102,7 +102,7 @@ def sortGamesFromAllGames():
     settings.finishedGames = []
 
     for game in settings.allGames:
-        if game.state == 2:
+        if game.state == 2 or game.state == 5 or game.state == 6:
             settings.finishedGames.append(game)
         else:
             settings.openGames.append(game)
@@ -197,11 +197,11 @@ def requestAndAcceptGames():
 
     # look at all open ones that have not yet been accepted, accept them
     for game in settings.openGames:
-        if game.state == 0:
+        if game.state == 0 and game.your_turn:
             if not 'true' in json.dumps(settings.api.accept_game(game.game_id)):
-                print "Could not accept game! Assuming logged out, trying to log back in\n"
-                settings.loggedIn = False
-                settings.authenticateUser()
+                print "Could not accept game\n"
+                #settings.loggedIn = False
+                #settings.authenticateUser()
 
     # look at all requests that we should make and see whether we already have a game with that player
     for key in settings.opponents:
@@ -241,14 +241,14 @@ def botLoop():
         for game in settings.openGames:
             if game.state == 1 and game.your_turn == True:
                 agentPlayGame(game)
-                
+
                 # Wait for REST to catch up
                 time.sleep(2)
                 continue
-        
+
         # 3 hour Delay to make sure bot does not burn cpu resources. This is handled in this way to make keyboardinterrupts possible
         sys.stdout.write("Sleeping: ")
-        delayTime = 60 * 10
+        delayTime = 60 * 2
         for x in range(0, delayTime):
             clear()
             # Display progress bar
